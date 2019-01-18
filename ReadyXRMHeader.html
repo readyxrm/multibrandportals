@@ -1,0 +1,211 @@
+{% comment %}
+ReadyXRMHeader Template
+Multi-Portal Sample
+Nick Doelman
+2019.1.18
+{% endcomment %}
+
+{% assign defaultlang = settings['LanguageLocale/Code'] | default: 'en-us' %}
+{% assign homeurl = website.adx_partialurl %}
+
+{% assign urlpath = request.path | downcase %}
+{% if urlpath == "/" %}
+  {% assign rxrm_brand = "home" %}
+  {% assign rxrm_navclass = "navbar rxrm-navbar-home navbar-static-top" %}
+
+{% elsif urlpath contains "red_landing" %}
+  {% assign rxrm_brand = "RED" %}
+  {% assign rxrm_navclass = "navbar navbar-inverse navbar-static-top" %}
+
+{% elsif urlpath contains "blue_landing" %}
+  {% assign rxrm_brand = "BLUE" %}
+  {% assign rxrm_navclass = "navbar navbar-inverse navbar-static-top" %}
+
+{% elsif urlpath contains "green_landing" %}
+  {% assign rxrm_brand = "GREEN" %}
+  {% assign rxrm_navclass = "navbar navbar-inverse navbar-static-top" %}
+
+{% elsif urlpath contains "profile" %}
+  {% assign rxrm_brand = "profile" %}
+  {% assign rxrm_navclass = "navbar rxrm-navbar-home navbar-static-top" %}
+
+{% else %}
+  {% assign rxrm_brand = "other" %}
+  {% assign rxrm_navclass = "navbar rxrm-navbar-home navbar-static-top" %}
+
+{% endif %}
+<div class="{{ rxrm_navclass }}" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <div class="visible-xs-block">
+                {% editable snippets 'Mobile Header' type: 'html' %}
+            </div>
+            <div class="visible-sm-block visible-md-block visible-lg-block navbar-brand">
+                {% if rxrm_brand == "RED" %}{% editable snippets 'RED Navbar Left' type: 'html' %}
+                {% elsif rxrm_brand == "BLUE" %}{% editable snippets 'BLUE Navbar Left' type: 'html' %}
+                {% elsif rxrm_brand == "GREEN" %}{% editable snippets 'GREEN Navbar Left' type: 'html' %}
+                {% else %}{% editable snippets 'Navbar Left' type: 'html' %}
+                {% endif %}
+            </div>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" onclick="setHeight();">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            {% if rxrm_brand == "RED" %}{% assign primary_nav = weblinks["RED Primary Navigation"] %}
+            {% elsif rxrm_brand == "BLUE" %}{% assign primary_nav = weblinks["BLUE Primary Navigation"] %}
+            {% elsif rxrm_brand == "GREEN" %}{% assign primary_nav = weblinks["GREEN Primary Navigation"] %}
+            {% elsif rxrm_brand == "profile" %}{% assign primary_nav = weblinks["Profile Primary Navigation"] %}
+            {% else %}{% assign primary_nav = weblinks["Primary Navigation"] %}
+            {% endif %}
+
+            {% if primary_nav %}
+            <div class="navbar-right menu-bar {% if primary_nav.editable %}xrm-entity xrm-editable-adx_weblinkset{% endif %}" data-weblinks-maxdepth="2">
+                <ul class="nav navbar-nav weblinks">
+                    {% for link in primary_nav.weblinks %}
+                    {% unless forloop.first %}
+                    <li class="divider-vertical"></li>
+                    {% endunless %}
+                    {% if link.display_page_child_links %}
+                    {% if link.url != null %}
+                    {% assign sublinks = sitemap[link.url].children %}
+                    {% endif %}
+                    {% else %}
+                    {% assign sublinks = link.weblinks %}
+                    {% endif %}
+
+                    <li class="weblink {% if sublinks.size > 0 %} dropdown{% endif %}">
+                        <a {% if sublinks.size>0 -%}
+                            href="#" class="dropdown-toggle" data-toggle="dropdown"
+                            {%- else -%}
+                            href="{{ link.url | escape }}"
+                            {%- endif -%}
+                            {%- if link.nofollow %} rel="nofollow"{% endif -%}
+                            {%- if link.tooltip %} title="{{ link.tooltip | escape }}"{% endif %}>
+                            {%- if link.image -%}
+                            {%- if link.image.url startswith '.' -%}
+                            <span class="{{ link.image.url | split:'.' | join }}" aria-hidden="true"></span>
+                            {%- else -%}
+                            <img src="{{ link.image.url | escape }}" alt="{{ link.image.alternate_text | default:link.tooltip | escape }}" {% if link.image.width %}width="{{ link.image.width | escape }}" {% endif %} {% if link.image.height %}height="{{ link.image.height | escape }}" {% endif %} />
+                            {%- endif -%}
+                            {%- endif -%}
+                            {%- unless link.display_image_only -%}
+                            {{ link.name | escape }}
+                            {%- endunless -%}
+                            {%- if sublinks.size > 0 -%}
+                            <span class="caret"></span>
+                            {%- endif -%}
+                        </a>
+                        {% if sublinks.size > 0 %}
+                        <ul class="dropdown-menu" role="menu">
+                            {% if link.url %}
+                            <li>
+                                <a href="{{ link.url }}" {% if link.nofollow %}rel="nofollow" {% endif %} {% if link.tooltip %}title="{{ link.tooltip }}" {% endif %}>{{ link.name }}</a>
+                            </li>
+                            <li class="divider"></li>
+                            {% endif %}
+                            {% for sublink in sublinks %}
+                            <li>
+                                <a href="{{ sublink.url }}" {% if sublink.nofollow %}rel="nofollow" {% endif %} {% if sublink.tooltip %}title="{{ sublink.tooltip }}" {% endif %}>
+                                    {{ sublink.name | default:sublink.title }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                    {% assign search_enabled = settings['Search/Enabled'] | boolean | default:true %}
+                    {% if search_enabled %}
+                    <li class="divider-vertical"></li>
+                    <li class="dropdown">
+                        <a class="navbar-icon" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" aria-label="{{ snippets["Header/Search/ToolTip"] | default:resx["Search_DefaultText"] | escape }}">
+                            <span class="glyphicon glyphicon-search">
+                        </a>
+                        </a>
+                        <ul class="dropdown-menu dropdown-search">
+                            <li>
+                                {% include 'Search' %}
+                            </li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    <li class="divider-vertical"></li>
+                    {% if website.languages.size > 1 %}
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" title="{{ website.selected_language.name | escape }}">
+                            <span class="drop_language">{{ website.selected_language.name | escape }}</span>
+                            <span class="caret"></span>
+                        </a>
+                        {% include 'Languages Dropdown' %}
+                    </li>
+                    <li class="divider-vertical"></li>
+                    {% endif %}
+                    {% if user %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" title="{{ user.fullname | escape }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <span class="username">{{ user.fullname | escape }}</span>
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            {% assign show_profile_nav = settings["Header/ShowAllProfileNavigationLinks"] | boolean | default:true %}
+                            {% if show_profile_nav %}
+                            {% assign profile_nav = weblinks["Profile Navigation"] %}
+                            {% if profile_nav %}
+                            {% for link in profile_nav.weblinks %}
+                            <li>
+                                <a href="{{ link.url | escape }}" title="{{ link.name | escape }}">{{ link.name | escape }}</a>
+                            </li>
+                            {% endfor %}
+                            {% endif %}
+                            {% else %}
+                            <li><a href="{{ sitemarkers['Profile'].url | escape }}">{{ snippets["Profile Link Text"] | default:"Profile" }}</a></li>
+                            {% endif %}
+                            <li class="divider" role="separator"></li>
+                            <li>
+                                <a href="{% if homeurl%}/{{ homeurl }}{% endif %}/Account/Login/LogOff?returnUrl={{ request.raw_url_encode }}" title="{{ snippets["links/logout"] | default:resx["Sign_Out"] | h }}">
+                                    {{ snippets["links/logout"] | default:resx["Sign_Out"] | h }}
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% elsif rxrm_brand != "home" %}
+                    <li>
+                        <a href="{% if homeurl%}/{{ homeurl }}{% endif %}/SignIn?returnUrl={{ request.raw_url_encode }}">
+                            {{ snippets["links/login"] | default:resx["Sign_In"] | h }}
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                {% editable primary_nav %}
+            </div>
+            {% endif %}
+            <div class="navbar-right hidden-xs">
+                {% editable snippets 'Navbar Right' type: 'html' %}
+            </div>
+        </div>
+    </div>
+</div>
+{% assign current_page = page.adx_partialurl %}
+{% assign sr_page = sitemarkers["Search"].url | remove: '/' %}
+{% assign forum_page = sitemarkers["Forums"].url | remove: '/' %}
+{% if current_page %}
+  {% if current_page == sr_page or current_page == forum_page %}
+<section class="page_section section-landing-{{ current_page }} color-inverse">
+    <div class="container">
+        <div class="row ">
+            <div class="col-md-12 text-center">
+                {% if current_page == sr_page %}
+                <h1 class="section-landing-heading">{% editable snippets 'Search/Title' default: resx["Discover_Contoso"] %}</h1>
+                {% include 'Search' %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+  {% endif %}
+{% endif %}
+

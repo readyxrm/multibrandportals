@@ -1,0 +1,87 @@
+{% comment %}
+ReadyXRMFooter Template
+Multi-Portal Sample
+Nick Doelman
+2019.1.18
+{% endcomment %}
+
+{% assign urlpath = request.path | downcase %}
+{% if urlpath == "/" %}
+  {% assign rxrm_brand = "home" %}
+{% elsif urlpath contains "green" %}
+  {% assign rxrm_brand = "GREEN" %}
+{% elsif urlpath contains "red" %}
+  {% assign rxrm_brand = "RED" %}
+{% elsif urlpath contains "blue" %}
+  {% assign rxrm_brand = "BLUE" %}
+{% else %}
+  {% assign rxrm_brand = "other" %}
+{% endif %}
+
+{% if rxrm_brand != "home" %}
+<section id="gethelp" class="page_section section-diagonal-right color-inverse {% if page %}{% unless page.parent %}home-section{% endunless %}{% endif %} hidden-print">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</section>
+{% endif %}
+<footer role="contentinfo">
+    <div class="footer-top hidden-print">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-sm-12 col-xs-12 text-left">
+                    {% editable snippets 'About Footer' type: 'html' %}
+                </div>
+                <div class="col-md-6 col-sm-12 col-xs-12 text-right">
+                    <ul class="list-social-links">
+                        <li><a href="#"><span class="sprite sprite-facebook_icon"></span></a></li>
+                        <li><a href="#"><span class="sprite sprite-twitter_icon"></span></a></li>
+                        <li><a href="#"><span class="sprite sprite-email_icon"></span></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom hidden-print">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 col-sm-12 col-xs-12 text-left">
+                    {% editable snippets 'Footer' type: 'html' %}
+                </div>
+                {% assign footer_nav = weblinks["Footer"] %}
+                {% if footer_nav %}
+                <div class="col-md-8 col-sm-12 col-xs-12 text-left {% if footer_nav.editable %}xrm-entity xrm-editable-adx_weblinkset{% endif %}" data-weblinks-maxdepth="2">
+                    <ul class="row list-unstyled">
+                        {% for link in footer_nav.weblinks %}
+                        <li class="col-sm-3">
+                            <h4>{{ link.name }}</h4>
+                            <ul class="list-unstyled">
+                                {% if link.display_page_child_links %}
+                                {% assign sublinks = sitemap[link.url].children %}
+                                {% else %}
+                                {% assign sublinks = link.weblinks %}
+                                {% endif %}
+                                {% if sublinks.size > 0 %}
+                                {% for sublink in sublinks %}
+                                <li>
+                                    <a href="{{ sublink.url | escape }}">{{ sublink.name | default:sublink.title }}</a>
+                                </li>
+                                {% endfor %}
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% editable footer_nav %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+</footer>
+<script>
+var signLocation = window.location.href;
+ if(/signin/i.test(signLocation)) {
+   $('form').parents(".col-md-6:last").remove();
+ }
+</script>

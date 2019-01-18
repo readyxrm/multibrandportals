@@ -1,0 +1,28 @@
+/*
+RXRMcustom.css
+Multi-Portal Sample
+Nick Doelman
+2019.1.18
+*/
+
+.section-landing-blue {
+    background: linear-gradient(transparent, transparent), url("BLUEhero.jpg") no-repeat center;
+    background-size: cover; 
+  }
+  .section-landing-red {
+    background: linear-gradient(transparent, transparent), url("REDhero.jpg") no-repeat center;
+    background-size: cover; 
+  }
+  .section-landing-green {
+    background: linear-gradient(transparent, transparent), url("GREENhero.jpg") no-repeat center;
+    background-size: cover; 
+  }
+  
+  .home-subtitle {
+      color: black;
+      text-align: center;
+  }
+  .home-background {
+      background: linear-gradient(transparent, transparent), url("Homehero.jpg") no-repeat top;
+      background-size: auto 100%;
+  }

@@ -1,0 +1,36 @@
+{% comment %}
+REDHome Template
+Multi-Portal Sample
+Nick Doelman
+2019.1.18
+{% endcomment %}
+
+<section class="page_section section-landing section-landing-red">
+    <div class="container">
+        <div class="row ">
+            <div class="col-md-12">
+                <h2 class="section-landing-sub-heading">{% editable snippets 'RedLanding/Title' type: 'text' tag: 'span' %}</h2>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="page-heading">
+        {% block breadcrumbs %}
+        {% include 'Breadcrumbs' %}
+        {% endblock %}
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <section class="page_section">
+                <div class="container">
+                    <div class="content-home">
+                        <h2 class="blue_border">{% editable snippets "RedLanding/Heading" type: 'text' tag: 'span' %}</h2>
+                        {% include 'Page Copy' %}
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
